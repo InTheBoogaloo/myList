@@ -2,55 +2,60 @@
 #include <stdlib.h>
 #include "list.h"
 
+typedef enum ListResults{
+    LR_SUCCESS=1,
+    LR_LIST_NULL=-1
+}LR;
+
 struct Node{
     Node* next;
     Node* prev;
-    int value;
+    void*  value;
 };
 
 struct List{
     Node* head;
     Node* tail;
     size_t size;
+    size_t elem_size;
 };
 
 Node* create_node();
 
-Node* create_node(int value){
+Node* create_node(void* value){
     Node*  n;
     n=malloc(sizeof(Node));
+    if(!n) return NULL;
     n->next=NULL;
     n->prev=NULL;
     n->value=value;
     return n;
 }
 
-List* list_create(void){
+List* list_create(size_t elem_size){
     List* l=malloc(sizeof(List));
     if(!l) return NULL;
     l->head=NULL;
     l->tail=NULL;
     l->size=0;
+    l->elem_size=elem_size;
     return l;
 }
 
-void list_push_back(List* list, int value){
-    if(!list) return;
+LR list_push_back(List* list, void* value){
+    if(!list) return LR_LIST_NULL;
     if(!list->head){
         list->head=create_node(value);
         list->tail=list->head;
         list->size++;
-        return;
+        return  LR_SUCCESS;
     }else{
-        Node* tmp=list->head;
-        while(tmp->next){
-            tmp=tmp->next;
-        }
+        Node* tmp=list->tail;
         tmp->next=create_node(value);
         list->size++;
         tmp->next->prev=tmp;
         list->tail=tmp->next;
-        return;
+        return LR_SUCCESS;
     }
 }
 
@@ -59,10 +64,10 @@ size_t list_size(const List* list){
     return list->size;
 }
 
-int list_pop_back(List* list){
-    if(!list || !list->tail)return -66; 
+void* list_pop_back(List* list){
+    if(!list || !list->tail)return NULL; 
     Node* tmp=list->tail;
-    int value;
+    void* value;
     if(!tmp->prev && !tmp->next){
         value=list->tail->value;
         free(list->tail);
