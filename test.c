@@ -5,11 +5,11 @@ int main(){
     List* l=list_create(sizeof(int));
     int x = 10;
     printf("%i\n",list_push_back(l, &x));
-    int y = 20;
-    printf("%i\n",list_push_back(l, &y));
+    x = 20;
+    printf("%i\n",list_push_back(l, &x));
     printf(" lo que estaba guardado dentro del ultimo nodo:%i \n", *(int*)list_pop_back(l));
     printf(" lo que estaba guardado dentro del ultimo nodo:%i \n", *(int*)list_pop_back(l));
-
+    list_destroy(l);
     return 0;
 }
 

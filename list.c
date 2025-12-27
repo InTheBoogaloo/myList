@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "list.h"
+#include <string.h>
+
 
 typedef enum ListResults{
     LR_SUCCESS=1,
@@ -20,15 +22,17 @@ struct List{
     size_t elem_size;
 };
 
-Node* create_node();
+Node* create_node(void* value, size_t elem_size);
 
-Node* create_node(void* value){
+Node* create_node(void* value, size_t elem_size){
     Node*  n;
     n=malloc(sizeof(Node));
     if(!n) return NULL;
     n->next=NULL;
     n->prev=NULL;
-    n->value=value;
+    n->value=malloc(elem_size);
+    if(!n->value)  return NULL;
+    memcpy(n->value, value, elem_size);
     return n;
 }
 
@@ -45,13 +49,13 @@ List* list_create(size_t elem_size){
 LR list_push_back(List* list, void* value){
     if(!list) return LR_LIST_NULL;
     if(!list->head){
-        list->head=create_node(value);
+        list->head=create_node(value, list->elem_size);
         list->tail=list->head;
         list->size++;
         return  LR_SUCCESS;
     }else{
         Node* tmp=list->tail;
-        tmp->next=create_node(value);
+        tmp->next=create_node(value, list->elem_size);
         list->size++;
         tmp->next->prev=tmp;
         list->tail=tmp->next;
